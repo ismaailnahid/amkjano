@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>লাইভ ডায়েরি - GitHub Content থেকে</title>
+<style>
+  body {
+    font-family: 'Kalpurush', sans-serif;
+    background: #f5f5f5;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+  }
+  h1 {
+    text-align: center;
+  }
+  #diary-content {
+    white-space: pre-wrap; /* নতুন লাইন দেখানোর জন্য */
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    min-height: 300px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    font-size: 18px;
+    line-height: 1.6;
+  }
+  #date-picker {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+
+<h1>আমার লাইভ ডায়েরি</h1>
+
+<input type="date" id="date-picker" />
+
+<div id="diary-content">তারিখ নির্বাচন করুন</div>
+
+<script>
+  const diaryContentEl = document.getElementById('diary-content');
+  const datePicker = document.getElementById('date-picker');
+
+  // তোমার GitHub ইউজারনেম এবং রিপোজিটরি নাম এখানে বসাও
+  const githubUser = 'ismaailnahid';
+  const repo = 'my-diary';
+  const folder = 'entries';
+
+  // ডিফল্ট আজকের তারিখ সিলেক্ট করা থাকবে
+  datePicker.valueAsDate = new Date();
+
+  async function fetchDiary(dateStr) {
+    // GitHub raw URL ফরম্যাট:
+    // https://raw.githubusercontent.com/<user>/<repo>/main/<folder>/<date>.txt
+
+    const url = `https://raw.githubusercontent.com/${githubUser}/${repo}/main/${folder}/${dateStr}.txt`;
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('কোনো ডায়েরি পাওয়া যায়নি');
+      const text = await res.text();
+      diaryContentEl.textContent = text;
+    } catch (err) {
+      diaryContentEl.textContent = 'দুঃখিত, ঐ তারিখের ডায়েরি পাওয়া যায়নি।';
+    }
+  }
+
+  // তারিখ পরিবর্তন হলে ডায়েরি লোড করো
+  datePicker.addEventListener('change', () => {
+    const selectedDate = datePicker.value; // yyyy-mm-dd ফরম্যাট
+    fetchDiary(selectedDate);
+  });
+
+  // প্রথমে আজকের তারিখের ডায়েরি দেখাও
+  fetchDiary(datePicker.value);
+</script>
+
+</body>
+</html>
